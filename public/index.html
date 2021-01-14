@@ -10,11 +10,16 @@
     <body>
         <div class="centered-form">
             <div class="centered-form__box">
-                <h1>Join</h1>
+                <img src="/img/ghost-favicon.png" id=boo-icon>
+                <h1>Welcome to Boo!</h1>
+                <h2>The best online dating chat ever</h2>
+                <h3>Join Here</h2>
                 <form action="/chat.html">
                     <label>Display name</label>
                     <input type="text" name="username" placeholder="Display name" required>
-                    <label>Room</label>
+                    <label>Select a room</label>
+                    <select name="Select room" id="select-room"></select> 
+                    <label>Or start your own</label>
                     <input type="text" name="room" placeholder="Room" required>
                     <button>Join</button>
                 </form>
@@ -22,4 +27,7 @@
         </div>
 
     </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./js/join.js"></script>
 </html>

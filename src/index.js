@@ -5,6 +5,9 @@ const socketio = require('socket.io')
 const Filter = require('bad-words')
 const { generateMessage, generateLocationMessage } = require('./utils/messages')
 const { addUser, removeUser, getUser, getUsersInRoom} = require('./utils/users')
+const { addRoom, removeRoom, getRooms, roomExists} = require('./utils/rooms')
+
+
 
 const app  = express()
 const server = http.createServer(app)
@@ -18,6 +21,8 @@ app.use(express.static(publicDirectoryPath))
 io.on('connection', (socket) => {
     console.log('New WebSocket connection')
 
+    socket.emit('roomsList', getRooms())
+
     socket.on('join', (options, callback) => {
 
         const {error, user} = addUser({ id: socket.id, ...options})
@@ -28,6 +33,9 @@ io.on('connection', (socket) => {
             return callback(error)
         }
 
+        if (!roomExists(user.room)){
+            addRoom(user.room)
+        }
         socket.join(user.room)
 
         socket.emit('message', generateMessage('Admin', 'Welcome!'))
@@ -40,8 +48,6 @@ io.on('connection', (socket) => {
             room: user.room,
             users: getUsersInRoom(user.room)
         })
-
-        
         
 
         callback()
@@ -70,6 +76,9 @@ io.on('connection', (socket) => {
                 room: user.room,
                 users: getUsersInRoom(user.room)
             })
+            if (getUsersInRoom(user.room).length == 0){
+                removeRoom(user.room)
+            }
         }
         
     })
@@ -77,6 +86,9 @@ io.on('connection', (socket) => {
     socket.on('kickUser', () => {
         const user = removeUser(socket.id)
         io.to(user.room).emit('message', generateMessage('Admin', `${user.username}has been kicked because he/she swore too much!`))
+        if (getUsersInRoom(user.room).length == 0){
+            removeRoom(user.room)
+        }
     })
 
     socket.on('sendLocation', (location, callback) => {

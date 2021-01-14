@@ -14,12 +14,6 @@ const generateLocationMessage = (username, url) => {
     }
 }
 
-const generateAdminMessage = (text) => {
-    return {
-        text
-    }
-}
-
 module.exports = {
     generateMessage,
     generateLocationMessage
