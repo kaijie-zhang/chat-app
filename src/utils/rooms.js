@@ -18,6 +18,12 @@ const getRooms = () => {
     return rooms
 }
 
+const getOtherRooms = (thisRoom) =>{
+    thisRoom = thisRoom.trim().toLowerCase()
+    const otherRooms = rooms.filter((room) => room !== thisRoom)
+    return otherRooms
+}
+
 const roomExists = (room) => {
     return rooms.indexOf(room) > -1
 }
@@ -26,5 +32,6 @@ module.exports = {
     addRoom,
     removeRoom,
     getRooms,
-    roomExists
+    roomExists,
+    getOtherRooms
 }

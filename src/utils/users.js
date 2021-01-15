@@ -1,4 +1,5 @@
-const users = []
+const onlineUsers = []
+const offlineUsers = []
 
 // addUser, removeUser, getUser, getUsers
 
@@ -15,7 +16,7 @@ const addUser = ({id, username, room}) => {
     }
 
     // Check for existing user
-    const existingUser = users.find((user) => {
+    const existingUser = onlineUsers.find((user) => {
         return user.room === room && user.username === username
     })
 
@@ -28,33 +29,43 @@ const addUser = ({id, username, room}) => {
 
     // Store user
     const user = { id, username, room }
-    users.push(user)
+    onlineUsers.push(user)
     return { user }
 }
 
 const removeUser = (id) => {
-    const index = users.findIndex((user) => user.id === id)
+    const index = onlineUsers.findIndex((user) => user.id === id)
 
     if (index !== -1){
-        return users.splice(index, 1)[0]
+        offlineUsers.push(onlineUsers[index])
+        return onlineUsers.splice(index, 1)[0]
     }
 }
 
 const getUser = (id) => {
-    const user = users.find((user) => user.id === id)
+    const user = onlineUsers.find((user) => user.id === id)
     return user
 }
 
-const getUsersInRoom = (room) => {
+const getOnlineUsersInRoom = (room) => {
     room = room.trim().toLowerCase()
-    const usersInRoom = users.filter((user) => user.room === room)
-    return usersInRoom
+    console.log(room)
+    console.log(onlineUsers)
+    const onlineUsersInRoom = onlineUsers.filter((user) => user.room === room)
+    return onlineUsersInRoom
+}
+
+const getOfflineUsersInRoom = (room) => {
+    room = room.trim().toLowerCase()
+    const offlineUsersInRoom = offlineUsers.filter((user) => user.room === room)
+    return offlineUsersInRoom
 }
 
 module.exports = {
     addUser,
     removeUser,
     getUser,
-    getUsersInRoom
+    getOnlineUsersInRoom,
+    getOfflineUsersInRoom
 }
 

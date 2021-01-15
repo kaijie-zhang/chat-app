@@ -62,10 +62,13 @@ socket.on('locationMessage', (locationMessage) => {
     autoscroll()
 })
 
-socket.on('roomData', ({ room, users}) => {
+socket.on('roomData', ({ room, onlineUsers, offlineUsers, otherRooms}) => {
+    console.log("in roomdata:", onlineUsers, offlineUsers, otherRooms)
     const html = Mustache.render(sidebarTemplate, {
         room,
-        users
+        onlineUsers,
+        offlineUsers,
+        otherRooms
     })
     document.querySelector('#sidebar').innerHTML = html
 })

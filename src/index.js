@@ -4,8 +4,8 @@ const express = require('express')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
 const { generateMessage, generateLocationMessage } = require('./utils/messages')
-const { addUser, removeUser, getUser, getUsersInRoom} = require('./utils/users')
-const { addRoom, removeRoom, getRooms, roomExists} = require('./utils/rooms')
+const { addUser, removeUser, getUser, getOnlineUsersInRoom, getOfflineUsersInRoom} = require('./utils/users')
+const { addRoom, removeRoom, getRooms, roomExists, getOtherRooms} = require('./utils/rooms')
 
 
 
@@ -27,8 +27,6 @@ io.on('connection', (socket) => {
 
         const {error, user} = addUser({ id: socket.id, ...options})
 
-        console.log(getUsersInRoom(user.room))
-
         if (error) {
             return callback(error)
         }
@@ -41,12 +39,13 @@ io.on('connection', (socket) => {
         socket.emit('message', generateMessage('Admin', 'Welcome!'))
         socket.broadcast.to(user.room).emit('message', generateMessage('Admin', `${user.username} has joined the room!`))
 
-        console.log('From server: ' + getUsersInRoom(user.room))
-
+        console.log('Online users in room ', getOnlineUsersInRoom(user.room))
 
         io.to(user.room).emit('roomData', {
             room: user.room,
-            users: getUsersInRoom(user.room)
+            onlineUsers: getOnlineUsersInRoom(user.room),
+            offlineUsers: getOfflineUsersInRoom(user.room),
+            otherRooms: getOtherRooms(user.room)
         })
         
 
@@ -74,9 +73,12 @@ io.on('connection', (socket) => {
             io.to(user.room).emit('message', generateMessage('Admin', `${user.username} has left!`))
             io.to(user.room).emit('roomData', {
                 room: user.room,
-                users: getUsersInRoom(user.room)
+                onlineUsers: getOnlineUsersInRoom(user.room),
+                offlineUsers: getOfflineUsersInRoom(user.room),
+                otherRooms: getOtherRooms(user.room)
             })
-            if (getUsersInRoom(user.room).length == 0){
+            //TODO: broadcast other room data, but keep online and offline users to io emit only
+            if (getOnlineUsersInRoom(user.room).length == 0){
                 removeRoom(user.room)
             }
         }
@@ -86,7 +88,7 @@ io.on('connection', (socket) => {
     socket.on('kickUser', () => {
         const user = removeUser(socket.id)
         io.to(user.room).emit('message', generateMessage('Admin', `${user.username}has been kicked because he/she swore too much!`))
-        if (getUsersInRoom(user.room).length == 0){
+        if (getOnlineUsersInRoom(user.room).length == 0){
             removeRoom(user.room)
         }
     })

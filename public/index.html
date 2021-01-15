@@ -17,10 +17,12 @@
                 <form action="/chat.html">
                     <label>Display name</label>
                     <input type="text" name="username" placeholder="Display name" required>
-                    <label>Select a room</label>
-                    <select name="Select room" id="select-room"></select> 
-                    <label>Or start your own</label>
-                    <input type="text" name="room" placeholder="Room" required>
+                    <label for="room">Select a room or start your own</label>
+                        <input list="select-room" id="room" name="room" placeholder="Room" required autocomplete="off"/>
+                        <datalist id="select-room">
+                        </datalist>
+                    <!-- <label>Or start your own</label>
+                    <input type="text" name="room" placeholder="Room" required> -->
                     <button>Join</button>
                 </form>
             </div>
@@ -30,4 +32,5 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="./js/join.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
 </html>
