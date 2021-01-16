@@ -3,7 +3,11 @@ const rooms = []
 // addRoom, removeRemove, getRooms
 
 const addRoom = (room) => {
-    rooms.push(room.trim().toLowerCase())
+    room = room.trim().toLowerCase()
+    if (rooms.indexOf(room) <= -1){
+        rooms.push(room)
+    }
+    
 }
 
 const removeRoom = (room) => {

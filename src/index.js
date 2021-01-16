@@ -41,14 +41,8 @@ io.on('connection', (socket) => {
 
         console.log('Online users in room ', getOnlineUsersInRoom(user.room))
 
-        io.to(user.room).emit('roomData', {
-            room: user.room,
-            onlineUsers: getOnlineUsersInRoom(user.room),
-            offlineUsers: getOfflineUsersInRoom(user.room),
-            otherRooms: getOtherRooms(user.room)
-        })
-        
-
+        emitRoomData(user)
+    
         callback()
     })
 
@@ -71,16 +65,11 @@ io.on('connection', (socket) => {
 
         if (user) {
             io.to(user.room).emit('message', generateMessage('Admin', `${user.username} has left!`))
-            io.to(user.room).emit('roomData', {
-                room: user.room,
-                onlineUsers: getOnlineUsersInRoom(user.room),
-                offlineUsers: getOfflineUsersInRoom(user.room),
-                otherRooms: getOtherRooms(user.room)
-            })
-            //TODO: broadcast other room data, but keep online and offline users to io emit only
+
             if (getOnlineUsersInRoom(user.room).length == 0){
                 removeRoom(user.room)
             }
+            emitRoomData(user)
         }
         
     })
@@ -88,18 +77,28 @@ io.on('connection', (socket) => {
     socket.on('kickUser', () => {
         const user = removeUser(socket.id)
         io.to(user.room).emit('message', generateMessage('Admin', `${user.username}has been kicked because he/she swore too much!`))
-        if (getOnlineUsersInRoom(user.room).length == 0){
-            removeRoom(user.room)
-        }
+        emitRoomData(user)
     })
 
     socket.on('sendLocation', (location, callback) => {
         const user = getUser(socket.id)
+        console.log('sendLocation user', user)
         const locationUrl = `https://google.com/maps?q=${location.lat},${location.long}`
         io.to(user.room).emit('locationMessage', generateLocationMessage(user.username, locationUrl))
         callback()
     })
 })
+
+const emitRoomData = (user) => {
+    // Update room data for the room
+    io.to(user.room).emit('roomData', {
+        room: user.room,
+        onlineUsers: getOnlineUsersInRoom(user.room),
+        offlineUsers: getOfflineUsersInRoom(user.room),
+        allRooms: getRooms(),
+        currentUsername : user.username
+    })
+}
 
 
 server.listen(port, () => {

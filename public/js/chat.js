@@ -10,8 +10,7 @@ const $messages = document.querySelector('#messages')
 // Templates
 const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationMessageTemplate = document.querySelector('#location-message-template').innerHTML
-const systemMessageTemplate = document.querySelector('#system-message-template').innerHTML
-const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML
+const sideBarTemplate = document.querySelector('#sidebar-template').innerHTML
 
 // Options
 const { username, room} = Qs.parse(location.search, {ignoreQueryPrefix:true})
@@ -54,7 +53,7 @@ socket.on('message', (message) => {
 socket.on('locationMessage', (locationMessage) => {
     console.log('Location received: ', locationMessage)
     const html = Mustache.render(locationMessageTemplate, {
-        username: message.username,
+        username: locationMessage.username,
         locationUrl: locationMessage.url,
         createdAt: moment(locationMessage.createdAt).format('h:mm a')
     })
@@ -62,13 +61,13 @@ socket.on('locationMessage', (locationMessage) => {
     autoscroll()
 })
 
-socket.on('roomData', ({ room, onlineUsers, offlineUsers, otherRooms}) => {
-    console.log("in roomdata:", onlineUsers, offlineUsers, otherRooms)
-    const html = Mustache.render(sidebarTemplate, {
+socket.on('roomData', ({ room, onlineUsers, offlineUsers, allRooms, currentUsername}) => {
+    const html = Mustache.render(sideBarTemplate, {
         room,
         onlineUsers,
         offlineUsers,
-        otherRooms
+        allRooms,
+        currentUsername
     })
     document.querySelector('#sidebar').innerHTML = html
 })

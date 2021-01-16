@@ -1,3 +1,5 @@
+const { addRoom, removeRoom, getRooms, roomExists, getOtherRooms} = require('./rooms')
+
 const onlineUsers = []
 const offlineUsers = []
 
@@ -30,6 +32,12 @@ const addUser = ({id, username, room}) => {
     // Store user
     const user = { id, username, room }
     onlineUsers.push(user)
+
+    // Remove user from offline users
+    const offlineUsersIndex = offlineUsers.findIndex(userElement => userElement.username === user.username)
+    if (offlineUsersIndex > -1){
+        offlineUsers.splice(offlineUsersIndex, 1)
+    }
     return { user }
 }
 
@@ -37,9 +45,17 @@ const removeUser = (id) => {
     const index = onlineUsers.findIndex((user) => user.id === id)
 
     if (index !== -1){
-        offlineUsers.push(onlineUsers[index])
+        user = onlineUsers[index]
+        if (!offlineUsers.some(userElement => userElement.username === user.username)){
+            offlineUsers.push(user)
+        }
+        if (getOnlineUsersInRoom(user.room).length == 0){
+            removeRoom(user.room)
+        }
         return onlineUsers.splice(index, 1)[0]
     }
+
+
 }
 
 const getUser = (id) => {
