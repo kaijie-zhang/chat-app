@@ -1,4 +1,4 @@
-# poke-finder
+# Poké-Finder
 
 A chat-based web application that links Pokémon GO players together, to speed up your goals to become the ultimate trainer!
 
